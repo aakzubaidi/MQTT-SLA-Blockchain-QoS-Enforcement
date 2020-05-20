@@ -1,0 +1,68 @@
+---
+test:
+  name: Testing the performance of enforcement logic
+  description: This is an example benchmark for caliper, to test the backend DLT's
+    performance with simple account opening & querying transactions
+  workers:
+    type: local
+    number: 1
+  rounds:
+  - label: Fixed-Rate.
+    txNumber: 300
+    rateControl:
+      type: fixed-rate
+      opts:
+        tps: 50
+    callback: benchmarks/scenario/simple/QoSenforceReportViolations.js
+
+monitor:
+  type:
+  - docker
+  docker:
+    name:
+    - all
+  interval: 1
+
+# monitor:
+#   type:
+#   - docker
+#   - process
+#   - prometheus
+#   docker:
+#     containers:
+#     - all
+#     charting:
+#       polar:
+#         metrics: [all]
+#       bar:
+#         metrics: [Memory(max)]
+#   process:
+#     processes:    
+#     - command: node
+#       arguments: fabricClientWorker.js
+#       multiOutput: avg
+#     charting:
+#       bar:
+#         metrics: [all]
+#   prometheus:
+#     push_url: "http://localhost:9091"
+#     url: "http://localhost:9090"
+#     metrics:
+#       ignore: [prometheus, pushGateway, cadvisor, grafana, node-exporter]
+#       include:
+#         Endorse Time (s):
+#           query: rate(endorser_propsal_duration_sum{chaincode="mqttslaEnforce1:v0.0.1"}[5m])/rate(endorser_propsal_duration_count{chaincode="mqttslaEnforce1:v0.0.1"}[5m])
+#           step: 1
+#           label: instance		
+#           statistic: avg
+#         Max Memory (MB):
+#           query: sum(container_memory_rss{name=~".+"}) by (name)
+#           step: 10
+#           label: name		
+#           statistic: max
+#           multiplier: 0.000001
+#     charting:
+#       polar:
+#         metrics: [Max Memory (MB)]
+#       bar:
+#         metrics: [all]

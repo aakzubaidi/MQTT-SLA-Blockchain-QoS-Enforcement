@@ -1,0 +1,44 @@
+[
+    {
+        "transactionName": "qoSExists",
+        "transactionLabel": "A test qoSExists transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "createQoS",
+        "transactionLabel": "A test createQoS transaction",
+        "arguments": [
+            "001",
+            "some value"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "readQoS",
+        "transactionLabel": "A test readQoS transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "updateQoS",
+        "transactionLabel": "A test updateQoS transaction",
+        "arguments": [
+            "001",
+            "some other value"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "deleteQoS",
+        "transactionLabel": "A test deleteQoS transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {}
+    }
+]
