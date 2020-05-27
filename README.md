@@ -1,2 +1,2 @@
 # MQTT-SLA-Blockchain-QoS-Enforcement
-The use of Blockchain to enforce SLA related to IoT components: Here is a use-case of MQTT SLA established by Google Cloud Platform IoT core. We use Hyperledger Fabric as underlying network and enforce the SLA using a smart contract written in Java.
+The use of Blockchain to enforce violation consequences stipulated in SLA-guaranteed IoT components. In the source code, we make use of an MQTT SLA established by Google Cloud Platform IoT core. We use Hyperledger Fabric as underlying network. We implement the enforcement logic as smart contract and represent the SLA related terms with blockchain. We provide a simulation of a monitoring agent. We conduct a benchmarking using Hyperledger Caliper. 
