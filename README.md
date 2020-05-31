@@ -10,11 +10,22 @@ The implementation of the enforcement logic as smart contract. The smart contrac
 
 ### Prerequisite
 * Visual studio Code
-* IBM Blockchain Platform Extension
+* IBM Blockchain Platform Extension. Install all required components requested by this extension.
+* VS code Docker extension
+* Go By microsoft
 * install all visual Code Code-relevant Java Extensions such as:
     * Debugger for Java
     * Maven
     * RedHat Language support for Java
-    *
+    * Java Test Runner
+    * Java Extension Pack by Microsoft
+    * Java dependency viewer
+    * Gradle Language support
+
+### Deploying and running the smart contract
+
+Follow the instructions described 
+[in this Youtube video](https://www.youtube.com/watch?v=eTRkADi3y6Q)
+
 
 
