@@ -21,17 +21,10 @@
     </build>
 
     <dependencies>
-    
-    <dependency>
+        <dependency>
             <groupId>org.hyperledger.fabric</groupId>
             <artifactId>fabric-gateway-java</artifactId>
-            <version>1.4.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hyperledger.fabric-sdk-java</groupId>
-            <artifactId>fabric-sdk-java</artifactId>
-            <version>1.4.8</version>
-        </dependency>
+            <version>1.4.2</version>
+          </dependency>
     </dependencies>
 </project>
