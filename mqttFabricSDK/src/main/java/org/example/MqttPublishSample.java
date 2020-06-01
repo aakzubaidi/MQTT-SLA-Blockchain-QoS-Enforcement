@@ -38,7 +38,6 @@ public class MqttPublishSample {
 				sampleClient = new MqttClient(broker, clientId + i, persistence);
 				connOpts.setCleanSession(true);
 				connOpts.setConnectionTimeout(2);
-				;
 				System.out.println("Connecting to broker: " + broker);
 				sampleClient.connect(connOpts);
 				System.out.println("Connected");
