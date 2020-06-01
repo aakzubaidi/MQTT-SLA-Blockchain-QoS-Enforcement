@@ -1,4 +1,6 @@
 <factorypath>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/eclipse/paho/org.eclipse.paho.client.mqttv3/1.2.1/org.eclipse.paho.client.mqttv3-1.2.1.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/hyperledger/fabric/fabric-gateway-java/1.4.3/fabric-gateway-java-1.4.3.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/hyperledger/fabric-sdk-java/fabric-sdk-java/1.4.8/fabric-sdk-java-1.4.8.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/io/grpc/grpc-netty/1.23.0/grpc-netty-1.23.0.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/io/grpc/grpc-core/1.23.0/grpc-core-1.23.0.jar" enabled="true" runInBatchMode="false"/>
