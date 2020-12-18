@@ -9,7 +9,9 @@ public class runner extends TimerTask {
 
     @Override
     public void run() {
+
         System.out.println("Task Timer on Fixed Rate");
+        System.out.println("I am thread whose name is: "+ Thread.currentThread().getName() + " with ID: "+ Thread.currentThread().getId());
         WriteToFile writeToFile = WriteToFile.getInstance();
 
         // instantiating Incidents class. We use conuccurent hashmap to acquire

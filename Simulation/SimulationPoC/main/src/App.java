@@ -24,7 +24,7 @@ public class App {
     // counters for checking the occurance of incidents and normal operation
     static int incidentCount = 0;
     static int nortmalCount = 0;
-    static int numberofIncidents = 1000;
+    static int numberofIncidents = 10;
 
     public static void main(final String[] args) throws Exception {
 
@@ -33,7 +33,7 @@ public class App {
         Incidents incidents = Incidents.getInstance();
 
         // schedule monitoring agent to check for incidents
-        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
         scheduler.scheduleAtFixedRate(new runner(), intialDelay, period, TimeUnit.SECONDS);
         // writer to a file>
         WriteToFile writeToFile = WriteToFile.getInstance();
@@ -42,20 +42,21 @@ public class App {
         for (int i = 1; i <= numberofIncidents; i++) {
 
             writeToFile.writetoFile("#############################\n"+ "Iteration "+ i+ ": try to write to a file from main" );
-            failureCount += ThreadLocalRandom.current().nextInt(minRandom, maxRandom);
-            validCount = i * factorofValidRequests;
+            failureCount = ThreadLocalRandom.current().nextInt(minRandom, maxRandom);
+            validCount += i * factorofValidRequests;
 
 
             // check if there is incidents to report
             if (failureCount > 0) {
 
+                //compose an incident
                 List<String> incidentValues = new ArrayList<String>();
                 // random Failures
                 incidentValues.add(Integer.toString(failureCount));
                 // random Failures
                 incidentValues.add(Integer.toString(validCount));
 
-                // we add this ordinary list (record of an incident) into a concurrent hashmap
+                // we add this (record of an incident) into a concurrent hashmap
                 // to acquire read/write lock
                 // the key is distinguished by nanoseconds to prevent updating the same key
                 incidents.incidentsLocalStore.put("#" + System.nanoTime(), incidentValues);
@@ -64,7 +65,7 @@ public class App {
                 // after reporting the failures and valid requests, the counts are reset to
                 // zeros
                 failureCount = 0;
-                validCount = 0;
+                //validCount = 0;
                 // increase number of repoerted incidents
                 incidentCount++;
                 System.out.println("The incident has been reported\n");

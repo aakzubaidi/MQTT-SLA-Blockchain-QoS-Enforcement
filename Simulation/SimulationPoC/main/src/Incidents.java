@@ -29,8 +29,7 @@ class Incidents {
     }
 
     public void printLocalIncidentStore() throws IOException {
-        System.out.println("<<< The current local incidents store consists of: >>> azooz");
+        System.out.println("<<< The current local incidents store consists of: >>> " + incidentsLocalStore);
         writeToFile.writetoFile("The current local incidents store consists of: "+ incidentsLocalStore);
-        System.out.println(incidentsLocalStore);
     }
 }
