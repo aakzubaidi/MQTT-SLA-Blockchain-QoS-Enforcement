@@ -1,10 +1,12 @@
 package org.example;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeoutException;
 
+import org.hyperledger.*;
 import org.hyperledger.fabric.gateway.Contract;
 import org.hyperledger.fabric.gateway.ContractException;
 import org.hyperledger.fabric.gateway.Gateway;
@@ -13,34 +15,65 @@ import org.hyperledger.fabric.gateway.Wallet;
 
 public final class FabricSDK {
     static {
-		System.setProperty("org.hyperledger.fabric.sdk.service_discovery.as_localhost", "true");
+        System.setProperty("org.hyperledger.fabric.sdk.service_discovery.as_localhost", "true");
     }
-    
-    String reportIncident (String mqttFailure) throws IOException {
+
+    // this where we grasp the QoS name.
+    private Config Availability;
+    private Path walletDirectory;
+    private Wallet wallet;
+    private Path networkConfigFile;
+    private Gateway.Builder builder;
+
+    public FabricSDK() throws IOException {
+        Availability = new Config();
 
         // Load an existing wallet holding identities used to access the network.
-        Path walletDirectory = Paths.get("Org1");
-        Wallet wallet = Wallet.createFileSystemWallet(walletDirectory);
+        walletDirectory = Paths.get("Org1");
+        wallet = Wallet.createFileSystemWallet(walletDirectory);
 
         // Path to a common connection profile describing the network.
-        Path networkConfigFile = Paths.get("1 Org Local Fabric - Org1_connection.json");
+        networkConfigFile = Paths.get("1 Org Local Fabric - Org1_connection.json");
 
         // Configure the gateway connection used to access the network.
-        Gateway.Builder builder = Gateway.createBuilder()
-                .identity(wallet, "org1Admin")
-                .networkConfig(networkConfigFile).discovery(true);
+        builder = Gateway.createBuilder().identity(wallet, "org1Admin").networkConfig(networkConfigFile)
+                .discovery(true);
+
+    }
+
+    String createQoSreport(String QoS) throws IOException {
 
         // Create a gateway connection
         try (Gateway gateway = builder.connect()) {
 
             // Obtain a smart contract deployed on the network.
             Network network = gateway.getNetwork("mychannel");
-            Contract contract = network.getContract("Ali");
+            Contract contract = network.getContract("QoSenforce");
+            // create a monitoring report about a QoS metric.
+            byte[] CreateCloudProviderRecord = contract.submitTransaction("createMonitoringReport", QoS, "0", "0");
+            System.out.println(new String(CreateCloudProviderRecord, StandardCharsets.UTF_8));
 
-            //byte[] CreateCloudProviderRecord = contract.submitTransaction("createMonitoringReport", "cp1", "0", "0");
-            //System.out.println(new String(CreateCloudProviderRecord, StandardCharsets.UTF_8));
-             //a monitoring agents submits incident to the smart contract about a cloud provider
-            byte[] ReportViolationResult = contract.submitTransaction("reportViolation", "cp1", "3", "1000");
+        } catch (ContractException | TimeoutException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return ("");
+    }
+
+    String reportIncident(String QoS, int validMQTTrequestsCount, String mqttFailure) throws IOException {
+
+        // Create a gateway connection
+        try (Gateway gateway = builder.connect()) {
+
+            // Obtain a smart contract deployed on the network.
+            Network network = gateway.getNetwork("mychannel");
+            Contract contract = network.getContract("QoSenforce");
+
+            // a monitoring agents submits incident to the smart contract about a cloud
+            // provider
+            byte[] ReportViolationResult = contract.submitTransaction("reportViolation", QoS, "1", Integer.toString(validMQTTrequestsCount));
             System.out.println(new String(ReportViolationResult, StandardCharsets.UTF_8));
 
         } catch (ContractException | TimeoutException e) {
@@ -51,4 +84,31 @@ public final class FabricSDK {
 
         return ("");
     }
+
+
+    String assessCompliance(String period, String QoS, int validMQTTrequestsCount, String mqttFailure) throws IOException {
+
+        // Create a gateway connection
+        try (Gateway gateway = builder.connect()) {
+
+            // Obtain a smart contract deployed on the network.
+            Network network = gateway.getNetwork("mychannel");
+            Contract contract = network.getContract("QoSenforce");
+
+            // a monitoring agents submits incident to the smart contract about a cloud
+            // provider
+            byte[] ReportViolationResult = contract.submitTransaction("assessCompliance", period,  QoS, "0", Integer.toString(validMQTTrequestsCount));
+            System.out.println(new String(ReportViolationResult, StandardCharsets.UTF_8));
+            System.out.println("The valid requests count so far is --> "+ Integer.toString(validMQTTrequestsCount));
+
+        } catch (ContractException | TimeoutException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return ("");
+    }
+
+
 }

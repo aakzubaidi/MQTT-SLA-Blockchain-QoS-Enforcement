@@ -25,6 +25,17 @@ public class MqttPublishSample {
 	 * @throws IOException
 	 */
 	public static void main(final String[] args) throws IOException {
+		
+		//assigning the QoS a name.
+		Config Availability = new Config();
+		Availability.setQoS("biggerToknowBetter");
+
+		//an instance of the Fabric SDK for conducting Blockchain operations that interfaces with the installed smart contract.
+		final FabricSDK bridge = new FabricSDK();
+
+		bridge.createQoSreport(Availability.getQoS());
+
+		
 		MqttClient sampleClient;
 		final String topic = "sampling";
 		String content = "Message from Monitoring agent";
@@ -33,7 +44,9 @@ public class MqttPublishSample {
 		final String clientId = "Client: ";
 		final MemoryPersistence persistence = new MemoryPersistence();
 
-		for (int i = 1; i <= 100; i++) {
+		int validMQTTrequestsCount = 0;
+
+		for (int i = 1; i <= 10; i++) {
 			try {
 				sampleClient = new MqttClient(broker, clientId + i, persistence);
 				connOpts.setCleanSession(true);
@@ -52,6 +65,7 @@ public class MqttPublishSample {
 				System.out.println("Message published: " + (i));
 				sampleClient.disconnect();
 				System.out.println("Disconnected");
+				validMQTTrequestsCount++;
 			} catch (final MqttException me) {
 				System.out.println("reason " + me.getReasonCode());
 				System.out.println("msg " + me.getMessage());
@@ -60,13 +74,13 @@ public class MqttPublishSample {
 				System.out.println("excep " + me);
 				//me.printStackTrace();
 
-				final FabricSDK bridge = new FabricSDK();
-				bridge.reportIncident(me.getMessage());
+				bridge.reportIncident(Availability.getQoS(), validMQTTrequestsCount, me.getMessage());
 			}
 
 		}
 
 
+		bridge.assessCompliance("month345634554", Availability.getQoS(), validMQTTrequestsCount, "0");
 	}
 
 }
