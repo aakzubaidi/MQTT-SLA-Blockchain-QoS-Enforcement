@@ -5,8 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeoutException;
-
-import org.hyperledger.*;
 import org.hyperledger.fabric.gateway.Contract;
 import org.hyperledger.fabric.gateway.ContractException;
 import org.hyperledger.fabric.gateway.Gateway;
@@ -19,14 +17,14 @@ public final class FabricSDK {
     }
 
     // this where we grasp the QoS name.
-    private Config Availability;
+    private Config QoSmetric;
     private Path walletDirectory;
     private Wallet wallet;
     private Path networkConfigFile;
     private Gateway.Builder builder;
 
     public FabricSDK() throws IOException {
-        Availability = new Config();
+        QoSmetric = new Config();
 
         // Load an existing wallet holding identities used to access the network.
         walletDirectory = Paths.get("Org1");
@@ -49,7 +47,7 @@ public final class FabricSDK {
             // Obtain a smart contract deployed on the network.
             Network network = gateway.getNetwork("mychannel");
             Contract contract = network.getContract("QoSenforce");
-            // create a monitoring report about a QoS metric.
+            // create a new monitoring report about a QoS metric.
             byte[] CreateCloudProviderRecord = contract.submitTransaction("createMonitoringReport", QoS, "0", "0");
             System.out.println(new String(CreateCloudProviderRecord, StandardCharsets.UTF_8));
 
@@ -62,8 +60,18 @@ public final class FabricSDK {
         return ("");
     }
 
-    String reportIncident(String QoS, int validMQTTrequestsCount, String mqttFailure) throws IOException {
 
+   /**
+    * Report incidents to the smart contract
+    * @param QoS the name of the QoS metric
+    * @param failedMQTTrequestsCount count of Failed MQTT requests
+    * @param validMQTTrequestsCount count of Valid MQTT requests
+    * @return TransactionStatus : result of the transaction
+    * @throws IOException
+    */
+    String reportIncident(String QoS,int failedMQTTrequestsCount, int validMQTTrequestsCount) throws IOException {
+
+        String TransactionStatus = "Success";
         // Create a gateway connection
         try (Gateway gateway = builder.connect()) {
 
@@ -73,20 +81,33 @@ public final class FabricSDK {
 
             // a monitoring agents submits incident to the smart contract about a cloud
             // provider
-            byte[] ReportViolationResult = contract.submitTransaction("reportViolation", QoS, "1", Integer.toString(validMQTTrequestsCount));
+            byte[] ReportViolationResult = contract.submitTransaction("reportViolation", QoS, Integer.toString(failedMQTTrequestsCount), Integer.toString(validMQTTrequestsCount));
             System.out.println(new String(ReportViolationResult, StandardCharsets.UTF_8));
 
         } catch (ContractException | TimeoutException e) {
+            TransactionStatus = "fail";
             e.printStackTrace();
         } catch (InterruptedException e) {
+            TransactionStatus = "fail";
             e.printStackTrace();
         }
 
-        return ("");
+        return TransactionStatus;
     }
 
 
-    String assessCompliance(String period, String QoS, int validMQTTrequestsCount, String mqttFailure) throws IOException {
+
+    /**
+     * Assess Compliance of Service Provider
+     * @param ReportID Report ID 
+     * @param QoS the name of the QoS metric
+     * @param failedMQTTrequestsCount count of Failed MQTT requests
+     * @param validMQTTrequestsCount count of Valid MQTT requests
+     * @return
+     * @throws IOException
+     */
+
+    String assessCompliance(String ReportID, String QoS,int failedMQTTrequestsCount, int validMQTTrequestsCount) throws IOException {
 
         // Create a gateway connection
         try (Gateway gateway = builder.connect()) {
@@ -97,9 +118,8 @@ public final class FabricSDK {
 
             // a monitoring agents submits incident to the smart contract about a cloud
             // provider
-            byte[] ReportViolationResult = contract.submitTransaction("assessCompliance", period,  QoS, "0", Integer.toString(validMQTTrequestsCount));
+            byte[] ReportViolationResult = contract.submitTransaction("assessCompliance", ReportID,  QoS, Integer.toString(failedMQTTrequestsCount), Integer.toString(validMQTTrequestsCount));
             System.out.println(new String(ReportViolationResult, StandardCharsets.UTF_8));
-            System.out.println("The valid requests count so far is --> "+ Integer.toString(validMQTTrequestsCount));
 
         } catch (ContractException | TimeoutException e) {
             e.printStackTrace();
