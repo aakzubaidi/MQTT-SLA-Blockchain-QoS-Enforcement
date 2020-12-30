@@ -37,9 +37,9 @@ public class MqttPublishSample {
 		bridge.createQoSreport(QoSmetric.getQoS());
 
 		// duration in days
-		final int Duration = 10;
+		final int Duration = 5;
 		final int minMQTTResuests = 0;
-		final int MaxMQTTRequests = 5;
+		final int MaxMQTTRequests = 10;
 		// MQTT client
 		MqttClient sampleClient;
 		// MQTT topic
@@ -51,13 +51,14 @@ public class MqttPublishSample {
 		final String reportID = "monthlyReport" + System.nanoTime();
 		final MemoryPersistence persistence = new MemoryPersistence();
 
-		//count of current valid MQTT requests
+		// count of current valid MQTT requests
 		int validMQTTrequestsCount = 0;
-		//count of current Failed MQTT requests
+		// count of current Failed MQTT requests
 		int failedMQTTrequestsCount = 0;
 
-		//for testing purposes, we count all fail and valid requesrs for entire emulation run for comparision purposes
-		//total valid count of MQTT
+		// for testing purposes, we count all fail and valid requesrs for entire
+		// emulation run for comparision purposes
+		// total valid count of MQTT
 		int totalFail = 0;
 		int totalValid = 0;
 
@@ -76,8 +77,6 @@ public class MqttPublishSample {
 					final MqttMessage message = new MqttMessage(content.getBytes());
 					message.setQos(qos);
 
-
-
 					sampleClient.publish(topic, message);
 					System.out.println("Message published: " + (i));
 					sampleClient.disconnect();
@@ -94,34 +93,44 @@ public class MqttPublishSample {
 					System.out.println("cause " + me.getCause());
 					System.out.println("excep " + me);
 					// me.printStackTrace();
-					System.out.println("Day: " + i + "- MQTT request ID:" + j + "--> Error \n preparing incident to be submited to blockchain");
 
-					//assuming the blockchain transaction fails
-					String TransactionStatus = "fail";
-					//trying submitting until otherwise (until transaction succeeds)
-					while (TransactionStatus.equals("fail"))
-					{
-						System.out.println("Trying to submit an incident report to the blockchain\n");
-						//submit incident to blockchain
-						TransactionStatus = bridge.reportIncident(QoSmetric.getQoS(), failedMQTTrequestsCount,  validMQTTrequestsCount);
-						// Resting the count of valid MQTT requests
+					// if server is unavailable. We know so by using the responsecode.
+					if (me.getReasonCode() == 32103) {
+
+						System.out.println("Day: " + i + "- MQTT request ID:" + j
+								+ "--> Error \n preparing incident to be submited to blockchain");
+
+						// assuming the blockchain transaction fails
+						String TransactionStatus = "fail";
+						// trying submitting until otherwise (until transaction succeeds)
+						while (TransactionStatus.equals("fail")) {
+							System.out.println("Trying to submit an incident report to the blockchain\n");
+							// submit incident to blockchain
+							TransactionStatus = bridge.reportIncident(QoSmetric.getQoS(), failedMQTTrequestsCount,
+									validMQTTrequestsCount);
+							// Resting the count of valid MQTT requests
+						}
+						// once reporting succeeds, reset all current counters of valid of fail mqtt
+						// requests
+						validMQTTrequestsCount = 0;
+						failedMQTTrequestsCount = 0;
+
 					}
-					//once reporting succeeds, reset all current counters of valid of fail mqtt requests
-					validMQTTrequestsCount = 0;
-					failedMQTTrequestsCount= 0;	
-
 				}
 
 			}
 
 		}
 
-		// End of the service period. Now submiting transaction to invoke the compliance assessment by the smart contract
+		// End of the service period. Now submiting transaction to invoke the compliance
+		// assessment by the smart contract
+		System.out.println(
+				"End of the service period. Now submiting transaction to invoke the compliance assessment by the smart contract");
 		bridge.assessCompliance(reportID, QoSmetric.getQoS(), failedMQTTrequestsCount, validMQTTrequestsCount);
 		System.out.println("checking whether the smart contract performs as it should");
 		System.out.println("Total of Fail MQTT requests is ->>  " + totalFail);
 		System.out.println("Total of valid MQTT requests is ->>  " + totalValid);
-		System.out.println("ErrorRate should be: -->  " + (totalFail/totalValid)*100);
+		System.out.println("ErrorRate should be: -->  " + (totalFail / totalValid) * 100);
 
 	}
 
